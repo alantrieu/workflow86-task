@@ -1,15 +1,9 @@
-import java.util.ArrayList;
-import java.util.List;
-
 // just here to test examples out
+// ignore
 public class Main {
 
     public static void main (String[] args) {
 
-        LeafModule B = new LeafModule("B");
-        LeafModule D = new LeafModule("D");
-        LeafModule E = new LeafModule("E");
-        LeafModule F = new LeafModule("F");
         LeafModule H = new LeafModule("H");
         LeafModule I = new LeafModule("I");
 

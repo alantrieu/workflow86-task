@@ -7,10 +7,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @TestInstance(value = Lifecycle.PER_CLASS)
 public class TestCase {
     @Test
-    public void testExample1() {
+    public void testExample1() throws Exception {
         ModuleSystem moduleSystem = new ModuleSystem();
         moduleSystem.createModule("B", new ArrayList<>());
         moduleSystem.createModule("D", new ArrayList<>());
@@ -36,7 +40,7 @@ public class TestCase {
     }
 
     @Test
-    public void testExample2() {
+    public void testExample2() throws Exception {
         ModuleSystem moduleSystem = new ModuleSystem();
         moduleSystem.createModule("B", new ArrayList<>());
         moduleSystem.createModule("D", new ArrayList<>());
@@ -64,7 +68,7 @@ public class TestCase {
                 moduleSystem.getModuleDependencies("A"));
     }
 
-    @Test public void testExample3() {
+    @Test public void testExample3() throws Exception {
         ModuleSystem moduleSystem = new ModuleSystem();
         moduleSystem.createModule("B", new ArrayList<>());
         moduleSystem.createModule("D", new ArrayList<>());
@@ -89,10 +93,30 @@ public class TestCase {
         moduleSystem.addModule("I", "C");
         moduleSystem.removeModule("I", "D");
 
-        List<String> depend = moduleSystem.getModuleDependencies("I");
-        for (String child : depend) {
-            System.out.println(child);
-        }
+        Exception error = assertThrows(Exception.class, () -> {
+            moduleSystem.getModuleDependencies("G");
+        });
 
+        assertEquals("Error; dependency path has cycle", error.getMessage());
+
+        assertThrows(Exception.class, () -> {
+            moduleSystem.getModuleDependencies("C");
+        });
+
+        assertThrows(Exception.class, () -> {
+            moduleSystem.getModuleDependencies("A");
+        });
+
+        assertThrows(Exception.class, () -> {
+            moduleSystem.getModuleDependencies("I");
+        });
+
+        assertDoesNotThrow(() -> moduleSystem.getModuleDependencies("B"));
+        assertDoesNotThrow(() -> moduleSystem.getModuleDependencies("D"));
+        assertDoesNotThrow(() -> moduleSystem.getModuleDependencies("E"));
+        assertDoesNotThrow(() -> moduleSystem.getModuleDependencies("F"));
+        assertDoesNotThrow(() -> moduleSystem.getModuleDependencies("H"));
     }
+
+    // ADD MORE TEST CASES HERE
 }

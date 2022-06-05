@@ -1,12 +1,10 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class LeafModule implements Module {
-
-    private String ModuleID;
+public class LeafModule extends Module {
 
     public LeafModule (String ModuleID) {
-        this.ModuleID = ModuleID;
+        super(ModuleID);
     }
 
     @Override
@@ -17,11 +15,11 @@ public class LeafModule implements Module {
         return new ArrayList<String>();
     }
 
+    /**
+     * no dependencies; return empty list
+     */
     @Override
-    // getter
-    public String getModuleID() {
-        return this.ModuleID;
+    public List<Module> getDependenciesList() {
+        return new ArrayList<>();
     }
-
-    // no setter
 }

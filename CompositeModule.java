@@ -1,13 +1,12 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompositeModule implements Module {
+public class CompositeModule extends Module {
 
-    private String ModuleID;
     private List<Module> dependencies = new ArrayList<Module>();
 
     public CompositeModule(String ModuleID) {
-        this.ModuleID = ModuleID;
+        super(ModuleID);
     }
 
     public void addDependency(Module m) {
@@ -24,20 +23,23 @@ public class CompositeModule implements Module {
      */
     public List<String> getDependencies() {
         List<String> strDependencies = new ArrayList<String>();
-        for (Module child : dependencies) {
-            if (child instanceof CompositeModule) { // if composite, we check their children first
-                strDependencies.addAll(child.getDependencies());
-            } 
-            strDependencies.add(child.getModuleID());
+        try {
+            for (Module child : dependencies) {
+                if (child instanceof CompositeModule) { // if composite, we check their children first
+                    strDependencies.addAll(child.getDependencies());
+                } 
+                strDependencies.add(child.getModuleID());
+            }
+            return strDependencies;
+        } catch (StackOverflowError e) {
+            System.out.println("Error");
         }
         return strDependencies;
     }
 
-    @Override
     // getter
-    public String getModuleID() {
-        return this.ModuleID;
+    @Override
+    public List<Module> getDependenciesList() {
+        return this.dependencies;
     }
-
-    // no setter
 }

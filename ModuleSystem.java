@@ -54,7 +54,7 @@ public class ModuleSystem {
     }
 
     /**
-     * removes dependency
+     * removes dependency; used only for the JUnit tests
      * assumes valid arguments (i.e. parent is a composite module, and both exist)
      * 
      * @param parentID
@@ -68,7 +68,7 @@ public class ModuleSystem {
     }
 
     /**
-     * adds dependency
+     * adds dependency; used only for the JUnit tests
      * assumes valid arguments (i.e. parent is a composite module, and both exist)
      * 
      * @param parentID
@@ -81,18 +81,40 @@ public class ModuleSystem {
         ((CompositeModule) parent).addDependency(child);
     }
 
+    /**
+     * checks if we have an infinite loop
+     * 
+     * @param root
+     * @return false if cyclic, true otherwise
+     */
+    public boolean hasCycle(Module root) {
+        root.setVisiting(true);
+
+        for (String dependencyID : root.getDependencies()) {
+            Module dependency = findByID(dependencyID); 
+            if (dependency.getVisiting()) {
+                return true;
+            } else if (!dependency.getVisited() && hasCycle(dependency)) {
+                return true;
+            }
+        }
+
+        root.setVisiting(false);
+        root.setVisited(true);
+        return false;
+    }
+
     // this is the main answer to the technical test 
     // everything else is just setting up for this method
-    public List<String> getModuleDependencies(String ModuleID) {
+    public List<String> getModuleDependencies(String ModuleID) throws Exception {
         // find ModuleID
         Module rootModule = findByID(ModuleID);
-        
-        // ** below doesn't work; it changes the order for some reason
-        // now check for duplicates by taking advantage of hashsets 
-        // List<String> uniqueDependencies = new ArrayList<>(
-        //     new HashSet<>(rootModule.getDependencies())
-        // );
 
+        // throw exception if we have an infinite loop
+        if (hasCycle(rootModule)) {
+            throw new Exception("Error; dependency path has cycle");
+        }
+        
         // removing duplicates using streams instead
         // taken from
         // https://www.java67.com/2018/06/how-to-remove-duplicates-from-stream-in-java8-distinct-example.html
@@ -102,9 +124,6 @@ public class ModuleSystem {
         .distinct()
         .collect(Collectors.toList());
         
-        // check recursion loop
-
-
         return uniqueDependencies;
     }
 }
